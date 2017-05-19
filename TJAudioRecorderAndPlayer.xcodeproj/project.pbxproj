@@ -1,0 +1,333 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		617F25641ECD40EA0002646E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 617F25631ECD40EA0002646E /* main.m */; };
+		617F25671ECD40EA0002646E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 617F25661ECD40EA0002646E /* AppDelegate.m */; };
+		617F256A1ECD40EA0002646E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 617F25691ECD40EA0002646E /* ViewController.m */; };
+		617F256D1ECD40EA0002646E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 617F256B1ECD40EA0002646E /* Main.storyboard */; };
+		617F256F1ECD40EA0002646E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 617F256E1ECD40EA0002646E /* Assets.xcassets */; };
+		617F25721ECD40EA0002646E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 617F25701ECD40EA0002646E /* LaunchScreen.storyboard */; };
+		617F257C1ECD64B30002646E /* 冰雨.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 617F257B1ECD64B30002646E /* 冰雨.mp3 */; };
+		618286B31ECECA550096EF84 /* TJRecorderTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 618286B21ECECA550096EF84 /* TJRecorderTool.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		617F255F1ECD40EA0002646E /* TJAudioRecorderAndPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TJAudioRecorderAndPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		617F25631ECD40EA0002646E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		617F25651ECD40EA0002646E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		617F25661ECD40EA0002646E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		617F25681ECD40EA0002646E /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		617F25691ECD40EA0002646E /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		617F256C1ECD40EA0002646E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		617F256E1ECD40EA0002646E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		617F25711ECD40EA0002646E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		617F25731ECD40EA0002646E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		617F257B1ECD64B30002646E /* 冰雨.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "冰雨.mp3"; sourceTree = "<group>"; };
+		618286B11ECECA550096EF84 /* TJRecorderTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TJRecorderTool.h; sourceTree = "<group>"; };
+		618286B21ECECA550096EF84 /* TJRecorderTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TJRecorderTool.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		617F255C1ECD40EA0002646E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		617F25561ECD40EA0002646E = {
+			isa = PBXGroup;
+			children = (
+				617F25611ECD40EA0002646E /* TJAudioRecorderAndPlayer */,
+				617F25601ECD40EA0002646E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		617F25601ECD40EA0002646E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				617F255F1ECD40EA0002646E /* TJAudioRecorderAndPlayer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		617F25611ECD40EA0002646E /* TJAudioRecorderAndPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				618286B11ECECA550096EF84 /* TJRecorderTool.h */,
+				618286B21ECECA550096EF84 /* TJRecorderTool.m */,
+				617F25651ECD40EA0002646E /* AppDelegate.h */,
+				617F25661ECD40EA0002646E /* AppDelegate.m */,
+				617F25681ECD40EA0002646E /* ViewController.h */,
+				617F25691ECD40EA0002646E /* ViewController.m */,
+				617F256B1ECD40EA0002646E /* Main.storyboard */,
+				617F256E1ECD40EA0002646E /* Assets.xcassets */,
+				617F25701ECD40EA0002646E /* LaunchScreen.storyboard */,
+				617F25731ECD40EA0002646E /* Info.plist */,
+				617F25621ECD40EA0002646E /* Supporting Files */,
+			);
+			path = TJAudioRecorderAndPlayer;
+			sourceTree = "<group>";
+		};
+		617F25621ECD40EA0002646E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				617F257B1ECD64B30002646E /* 冰雨.mp3 */,
+				617F25631ECD40EA0002646E /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		617F255E1ECD40EA0002646E /* TJAudioRecorderAndPlayer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 617F25761ECD40EA0002646E /* Build configuration list for PBXNativeTarget "TJAudioRecorderAndPlayer" */;
+			buildPhases = (
+				617F255B1ECD40EA0002646E /* Sources */,
+				617F255C1ECD40EA0002646E /* Frameworks */,
+				617F255D1ECD40EA0002646E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TJAudioRecorderAndPlayer;
+			productName = TJAudioRecorderAndPlayer;
+			productReference = 617F255F1ECD40EA0002646E /* TJAudioRecorderAndPlayer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		617F25571ECD40EA0002646E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = Joshpell;
+				TargetAttributes = {
+					617F255E1ECD40EA0002646E = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = UNEC8F9P65;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 617F255A1ECD40EA0002646E /* Build configuration list for PBXProject "TJAudioRecorderAndPlayer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 617F25561ECD40EA0002646E;
+			productRefGroup = 617F25601ECD40EA0002646E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				617F255E1ECD40EA0002646E /* TJAudioRecorderAndPlayer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		617F255D1ECD40EA0002646E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				617F257C1ECD64B30002646E /* 冰雨.mp3 in Resources */,
+				617F25721ECD40EA0002646E /* LaunchScreen.storyboard in Resources */,
+				617F256F1ECD40EA0002646E /* Assets.xcassets in Resources */,
+				617F256D1ECD40EA0002646E /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		617F255B1ECD40EA0002646E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				618286B31ECECA550096EF84 /* TJRecorderTool.m in Sources */,
+				617F256A1ECD40EA0002646E /* ViewController.m in Sources */,
+				617F25671ECD40EA0002646E /* AppDelegate.m in Sources */,
+				617F25641ECD40EA0002646E /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		617F256B1ECD40EA0002646E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				617F256C1ECD40EA0002646E /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		617F25701ECD40EA0002646E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				617F25711ECD40EA0002646E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		617F25741ECD40EA0002646E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		617F25751ECD40EA0002646E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		617F25771ECD40EA0002646E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = UNEC8F9P65;
+				INFOPLIST_FILE = TJAudioRecorderAndPlayer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = cn.Joshpell.TJAudioRecorderAndPlayer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		617F25781ECD40EA0002646E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = UNEC8F9P65;
+				INFOPLIST_FILE = TJAudioRecorderAndPlayer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = cn.Joshpell.TJAudioRecorderAndPlayer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		617F255A1ECD40EA0002646E /* Build configuration list for PBXProject "TJAudioRecorderAndPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				617F25741ECD40EA0002646E /* Debug */,
+				617F25751ECD40EA0002646E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		617F25761ECD40EA0002646E /* Build configuration list for PBXNativeTarget "TJAudioRecorderAndPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				617F25771ECD40EA0002646E /* Debug */,
+				617F25781ECD40EA0002646E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 617F25571ECD40EA0002646E /* Project object */;
+}
