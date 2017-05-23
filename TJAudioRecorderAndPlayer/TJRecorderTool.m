@@ -98,12 +98,28 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
 
             NSError *sessionError;
             //AVAudioSessionCategoryPlay用于播放
-            [session setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
             if(session == nil){
-                NSLog(@"Error creating session: %@", [sessionError description]);
-            }else{
-                [session setActive:YES error:nil];
+                
+                session = [AVAudioSession sharedInstance];
+                
             }
+            [session setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
+            [session setActive:YES error:nil];
+            if (!sessionError) {
+                NSLog(@"Error creating session: %@", [sessionError description]);
+            }
+            
+            
+            if (![self isHeadsetPluggedIn]) {
+                NSError *audioError = nil;
+                BOOL success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&audioError];
+                if(!success)
+                {
+                    NSLog(@"error doing outputaudioportoverride - %@", [audioError localizedDescription]);
+                }
+            }
+            
+            
             return weakSelf;
         };
     }
@@ -162,6 +178,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
             [volumeTimer invalidate];
             volumeTimer = nil;
             
+            NSLog(@"停止录音");
             return weakSelf;
         };
     }
@@ -180,6 +197,8 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
             //结束定时器
             [volumeTimer invalidate];
             volumeTimer = nil;
+            
+            NSLog(@"暂停录音");
             return weakSelf;
         };
         
@@ -204,15 +223,17 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
             
             weakSelf.playerLocal = nil;
             
-            NSError *audioError = nil;
-            BOOL success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&audioError];
-            if(!success)
-            {
-                NSLog(@"error doing outputaudioportoverride - %@", [audioError localizedDescription]);
+            if (![self isHeadsetPluggedIn]) {
+                
+                //无耳机，打开外放模式
+                NSError *audioError = nil;
+                BOOL success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&audioError];
+                if(!success)
+                {
+                    NSLog(@"error doing outputaudioportoverride - %@", [audioError localizedDescription]);
+                }
             }
-            //此方法增大音量用，7.0后被废除
-            //UInt32 doChangeDefaultRoute = 1;
-            //AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryDefaultToSpeaker,sizeof(doChangeDefaultRoute), &doChangeDefaultRoute);
+
             
             NSData *data = [NSData dataWithContentsOfFile:playName];
             
@@ -221,6 +242,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
             if (weakSelf.playerLocal){
                 
                 [weakSelf.playerLocal play];
+                NSLog(@"播放本地录音");
             }else{
                 NSLog(@"本地录音播放器初始化失败");
                 
@@ -260,7 +282,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
                 [_songItem addObserver:weakSelf forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
                 
                 [self.playerNetwork play];
-                
+                NSLog(@"播放网络音频");
                 //启动定时器
                 if (!progressTimer) {
                     
@@ -402,8 +424,6 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
 
 -(void)recorderTimeViewer{
     
-    
-    
     if (self.timeObserverBlock) {
         if (_playerLocal) {
             
@@ -434,6 +454,15 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     }
 }
 
+//判断是否插入耳机
+- (BOOL)isHeadsetPluggedIn {
+    AVAudioSessionRouteDescription* route = [session currentRoute];
+    for (AVAudioSessionPortDescription* desc in [route outputs]) {
+        if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones])
+            return YES;
+    }
+    return NO;
+}
 #pragma mark lazy========================
 -(AVAudioRecorder *)recorder{
     

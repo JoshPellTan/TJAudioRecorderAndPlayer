@@ -78,7 +78,8 @@
 }
 
 -(void)playNetwork:(id)sender {
-    [TJRecorderTool sharedInstance].configureNetwork().playNetworkaAudio([NSURL URLWithString:@"http://cc.stream.qqmusic.qq.com/C100003j8IiV1X8Oaw.m4a?fromtag=52"]);
+    [TJRecorderTool sharedInstance].configureNetwork().playNetworkaAudio([NSURL URLWithString:@"http://weizitest-10076841.video.myqcloud.com/8a2c1fde57b20f550157b2151dad00042017/05/23/10/45/54.mp3"]);
+    
 }
 
 - (void)pause:(id)sender {
