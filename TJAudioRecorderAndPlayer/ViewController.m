@@ -14,7 +14,6 @@
 
 @property (nonatomic,strong) AVAudioRecorder *audioRecorder; //音频录音机
 @property (nonatomic,strong) AVAudioPlayer *audioPlayer;     //音频播放器
-@property (nonatomic,strong) NSTimer *timer;            //录音监控
 
 @property (nonatomic,strong) AVPlayer *player;
 
