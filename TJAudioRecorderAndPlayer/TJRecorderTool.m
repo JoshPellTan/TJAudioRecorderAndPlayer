@@ -8,8 +8,8 @@
 
 #import "TJRecorderTool.h"
 
-static const CGFloat volumeObserverMargin = 0.1; //音量监听的timer间隔
-static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间隔
+static const CGFloat volumeObserverMargin = 1; //录音时timer间隔
+static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间隔
 
 
 @interface TJRecorderTool ()
@@ -24,8 +24,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     NSTimer *progressTimer;
     double lowPassResults;
     
-    //录音名字
-    NSString *playName;
+    id timeObserve;
     
 }
 //录音器
@@ -33,12 +32,17 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
 //本地播放器
 @property (nonatomic, strong) AVAudioPlayer *playerLocal;
 //网络播放器
-@property (nonatomic, strong) AVPlayer *playerNetwork;
+@property (nonatomic, strong) AVPlayer *networkAudioPlayer;
 //网路播放item
 @property (nonatomic, strong) AVPlayerItem *songItem;
+//当前播放url
+@property (nonatomic,   copy) NSString *currentURL;
 //网络媒体总时长
-@property (nonatomic, assign) CGFloat netAudioTime;
-
+@property (nonatomic, assign) NSString *netAudioTime;
+//当前播放时间(秒)
+@property (nonatomic,   copy) NSString *currentPlayTime;
+//当前录音时长(秒)
+@property (nonatomic,   copy) NSString *currentRecordTime;
 
 @end
 
@@ -48,11 +52,19 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
 @synthesize configureRecorder = _configureRecorder;
 @synthesize configureNetwork = _configureNetwork;
 @synthesize startRecord = _startRecord;
+@synthesize continueRecord = _continueRecord;
 @synthesize stopRecorder = _stopRecorder;
 @synthesize playRecorderLocal = _playRecorderLocal;
-@synthesize playNetworkaAudio = _playNetworkaAudio;
+@synthesize pauseRecorderPlayLocal = _pauseRecorderPlayLocal;
+@synthesize continueRecorderPlayLocal = _continueRecorderPlayLocal;
+@synthesize stopRecorderPlayLocal = _stopRecorderPlayLocal;
+@synthesize downloadNetworkaAudio = _downloadNetworkaAudio;
+@synthesize playNetwork = _playNetwork;
+@synthesize pauseNetwork = _pauseNetwork;
+@synthesize stopNetwork = _stopNetwork;
 @synthesize getRecorderDataBlock = _getRecorderDataBlock;
 @synthesize pauseRecord = _pauseRecord;
+
 
 
 + (instancetype)sharedInstance {
@@ -72,15 +84,13 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
         __weak typeof(self) weakSelf = self;
         return ^(){
             
-            NSString *docDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-            playName = [NSString stringWithFormat:@"%@/play.aac",docDir];
             //录音设置
             recorderSettingsDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                   [NSNumber numberWithInt:kAudioFormatMPEG4AAC],AVFormatIDKey,
-                                   [NSNumber numberWithInt:8000],AVSampleRateKey,
-                                   [NSNumber numberWithInt:1],AVNumberOfChannelsKey,
-                                   [NSNumber numberWithInteger:AVAudioQualityHigh],AVEncoderAudioQualityKey,
-                                   nil];
+                                    [NSNumber numberWithInt:kAudioFormatMPEG4AAC],AVFormatIDKey,
+                                    [NSNumber numberWithInt:8000],AVSampleRateKey,
+                                    [NSNumber numberWithInt:1],AVNumberOfChannelsKey,
+                                    [NSNumber numberWithInteger:AVAudioQualityHigh],AVEncoderAudioQualityKey,
+                                    nil];
             
             return weakSelf;
         };
@@ -95,17 +105,17 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
         
         __weak typeof(self) weakSelf = self;
         return ^(){
-
+            
             NSError *sessionError;
             //AVAudioSessionCategoryPlay用于播放
             if(session == nil){
                 
                 session = [AVAudioSession sharedInstance];
-                
+                [session setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
+                [session setActive:YES error:nil];
             }
-            [session setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
-            [session setActive:YES error:nil];
-            if (!sessionError) {
+            
+            if (sessionError) {
                 NSLog(@"Error creating session: %@", [sessionError description]);
             }
             
@@ -140,6 +150,8 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
                 [session setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
                 [session setActive:YES error:nil];
                 
+                weakSelf.currentRecordTime = @"0";
+                
                 if (weakSelf.recorder) {
                     _recorder.meteringEnabled = YES;
                     [_recorder prepareToRecord];
@@ -166,6 +178,31 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     return _startRecord;
 }
 
+-(configerOrAction)continueRecord{
+    
+    if (!_continueRecord) {
+        __weak typeof(self) weakself = self;
+        
+        return ^(){
+            
+            _recorder.meteringEnabled = YES;
+            [_recorder prepareToRecord];
+            [_recorder record];
+            
+            //启动定时器
+            if (!volumeTimer) {
+                volumeTimer = [NSTimer scheduledTimerWithTimeInterval:volumeObserverMargin target:weakself selector:@selector(levelTimer:) userInfo:nil repeats:YES];
+            }
+            NSLog(@"开始录音");
+            
+            return weakself;
+        };
+        
+    }
+    return _configureNetwork;
+}
+
+
 -(configerOrAction)stopRecorder{
     if (!_stopRecorder) {
         
@@ -191,7 +228,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
         
         __weak typeof(self) weakSelf = self;
         return  ^(){
-          
+            
             [weakSelf.recorder pause];
             
             //结束定时器
@@ -212,6 +249,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
         
         if ([self.recorder isRecording]) {
             [self.recorder stop];
+
             self.recorder = nil;
             //结束定时器
             [volumeTimer invalidate];
@@ -219,9 +257,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
         }
         
         __weak typeof(self) weakSelf = self;
-        return ^(NSString *string){
-            
-            weakSelf.playerLocal = nil;
+        return ^(){
             
             if (![self isHeadsetPluggedIn]) {
                 
@@ -233,25 +269,24 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
                     NSLog(@"error doing outputaudioportoverride - %@", [audioError localizedDescription]);
                 }
             }
-
-            
-            NSData *data = [NSData dataWithContentsOfFile:playName];
-            
-            NSLog(@"录音文件大小-----%ld字节",data.length);
             
             if (weakSelf.playerLocal){
                 
                 [weakSelf.playerLocal play];
+                
                 NSLog(@"播放本地录音");
             }else{
                 NSLog(@"本地录音播放器初始化失败");
                 
             }
-            
+        
             //启动定时器
             if (!progressTimer) {
                 
                 progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
+            }else{
+                
+                [progressTimer  setFireDate:[NSDate distantPast]];
             }
             return weakSelf;
         };
@@ -260,40 +295,195 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     return _playRecorderLocal;
 }
 
--(configureURL)playNetworkaAudio{
+-(configerOrAction)pauseRecorderPlayLocal{
     
-    if (!_playNetworkaAudio) {
-
+    if (!_pauseRecorderPlayLocal) {
+        
         __weak typeof(self) weakSelf = self;
-        return ^(NSURL *url){
+        return ^(){
             
-            if (!weakSelf.songItem) {
+            
+            if (weakSelf.playerLocal){
                 
-                weakSelf.songItem = [[AVPlayerItem alloc]initWithURL:url];
+                [weakSelf.playerLocal pause];
+                
+                NSLog(@"暂停播放本地录音");
+                [progressTimer setFireDate:[NSDate distantFuture]];
             }
             
-            if (!weakSelf.playerNetwork) {
+            return weakSelf;
+        };
+        
+    }
+    return _pauseRecorderPlayLocal;
+}
+
+-(configerOrAction)continueRecorderPlayLocal{
+    
+    if (!_continueRecorderPlayLocal) {
+        __weak typeof(self) weakself = self;
+        return ^(){
+            
+            [weakself.playerLocal play];
+            
+            //启动定时器
+            if (!progressTimer) {
                 
-                weakSelf.playerNetwork = [[AVPlayer alloc]initWithPlayerItem:_songItem];
-                //监控状态属性，注意AVPlayer也有一个status属性，通过监控它的status也可以获得播放状态
-                [_songItem addObserver:weakSelf forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+                progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
+            }else{
                 
-                //监控网络加载情况属性
-                [_songItem addObserver:weakSelf forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-                
-                [self.playerNetwork play];
-                NSLog(@"播放网络音频");
-                //启动定时器
-                if (!progressTimer) {
-                    
-                    progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
-                }
+                [progressTimer  setFireDate:[NSDate distantPast]];
             }
+            
+            NSLog(@"继续播放本地录音");
+            
+            return weakself;
+        };
+        
+    }
+    return _continueRecorderPlayLocal;
+}
+
+
+-(configerOrAction)stopRecorderPlayLocal{
+    
+    if (!_stopRecorderPlayLocal) {
+        
+        __weak typeof(self) weakSelf = self;
+        return ^(){
+            
+            
+            if (weakSelf.playerLocal){
+                
+                [weakSelf.playerLocal stop];
+                weakSelf.playerLocal = nil;
+                
+                NSLog(@"停止播放本地录音");
+                [progressTimer invalidate];
+                progressTimer = nil;
+            }
+            
+            return weakSelf;
+        };
+        
+    }
+    return _stopRecorderPlayLocal;
+}
+
+
+-(configureURL)downloadNetworkaAudio{
+    
+    if (!_downloadNetworkaAudio) {
+        
+        __weak typeof(self) weakSelf = self;
+        return ^(NSString *url){
+            
+            weakSelf.songItem = [[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:url]];
+            
+            weakSelf.networkAudioPlayer = [[AVPlayer alloc]initWithPlayerItem:_songItem];
+            weakSelf.currentURL = url;
+            
+            //给当前歌曲添加监控
+            [weakSelf addObserver];
+            
             return weakSelf;
         };
     }
     
-    return _playNetworkaAudio;
+    return _downloadNetworkaAudio;
+}
+
+-(configerOrAction)playNetwork{
+    
+    if (!_playNetwork) {
+        
+        
+        __weak typeof(self) weakself = self;
+        
+        return ^(){
+            
+            
+            //启动定时器
+            if (!progressTimer) {
+                
+                progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
+            }else{
+                
+                [progressTimer  setFireDate:[NSDate distantPast]];
+            }
+            
+            [_networkAudioPlayer play];
+            
+            return weakself;
+        };
+    }
+    
+    return _playNetwork;
+    
+}
+
+-(configerOrAction)pauseNetwork{
+    
+    if (!_pauseNetwork) {
+        
+        __weak typeof(self) weakself = self;
+        
+        return ^(){
+            
+            [_networkAudioPlayer  pause];
+            
+            if (progressTimer) {
+                //定时器暂停
+                [progressTimer setFireDate:[NSDate distantFuture]];
+            }
+            
+            return weakself;
+        };
+    }
+    
+    return _playNetwork;
+    
+}
+
+-(configerOrAction)stopNetwork{
+    
+    if (!_stopNetwork) {
+        
+        __weak typeof(self) weakself = self;
+        
+        return ^(){
+            
+            [weakself.networkAudioPlayer pause];
+            weakself.currentPlayTime = @"0";
+            weakself.networkAudioPlayer = nil;
+            
+            if (progressTimer) {
+                
+                [progressTimer invalidate];
+                progressTimer = nil;
+                
+            }
+            
+            
+            return weakself;
+        };
+    }
+    
+    return _pauseNetwork;
+    
+}
+
+- (void)playerItemDidReachEnd:(NSNotification *)notification {
+    
+    [self.networkAudioPlayer pause];
+    self.netAudioTime = @"0";
+    
+    [progressTimer invalidate];
+    progressTimer = nil;
+    if (self.playerFinished) {
+        self.playerFinished();
+    }
+    
 }
 
 -(configerRecorderData)getRecorderDataBlock{
@@ -302,7 +492,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
         
         return ^(){
             
-            NSData *data = [NSData dataWithContentsOfFile:playName];
+            NSData *data = [NSData dataWithContentsOfFile:[self getRecorderPath]];
             NSLog(@"录音文件长度%ld",data.length);
             return data;
         };
@@ -311,7 +501,45 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     return _getRecorderDataBlock;
 }
 
+
 #pragma mark 辅助方法
+
+- (void)addObserver {
+    
+    //监控状态属性，注意AVPlayer也有一个status属性，通过监控它的status也可以获得播放状态
+    [_songItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    
+    //监控网络加载情况属性
+    [_songItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
+    
+    //网络音频结束监听
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playerItemDidReachEnd:)
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:_songItem];    //更新播放器进度
+    
+    AVPlayerItem *currentItem = self.networkAudioPlayer.currentItem;
+    __weak typeof(self) weakSelf = self;
+    timeObserve = [self.networkAudioPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1.0, 1.0) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
+        
+        float current = CMTimeGetSeconds(time);
+        float total = CMTimeGetSeconds(currentItem.duration);
+        
+        if (current) {
+            
+            weakSelf.currentPlayTime = [NSString stringWithFormat:@"%.f",current];
+            weakSelf.netAudioTime = [NSString stringWithFormat:@"%.2f",total];
+            
+        }
+    }];
+    
+    //监控状态属性，注意AVPlayer也有一个status属性，通过监控它的status也可以获得播放状态
+    [currentItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    //监控网络加载情况属性
+    [currentItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+
 /**
  *  通过KVO监控播放器状态
  *
@@ -326,7 +554,7 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     
     if ([keyPath isEqualToString:@"status"]) {
         
-        switch (self.playerNetwork.status) {
+        switch (self.networkAudioPlayer.status) {
             case AVPlayerStatusUnknown:
             {
                 NSLog(@"网路音频播放器状态不明");
@@ -335,8 +563,9 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
             case AVPlayerStatusReadyToPlay:
             {
                 NSLog(@"网路音频播放器状态可播放");
-                _netAudioTime = CMTimeGetSeconds(_songItem.asset.duration);
+                _netAudioTime = [NSString stringWithFormat:@"%.2f", CMTimeGetSeconds(_songItem.asset.duration)];
                 NSLog(@"网络媒体总时长%f",CMTimeGetSeconds(_songItem.asset.duration));
+                
             }
                 break;
             case AVPlayerStatusFailed:
@@ -389,6 +618,17 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
 
 -(void)levelTimer:(NSTimer*)timer_
 {
+    
+    CGFloat currentRecordTimeFloat = self.currentRecordTime.floatValue;
+    currentRecordTimeFloat ++;
+    self.currentRecordTime = [NSString stringWithFormat:@"%.0f",currentRecordTimeFloat];
+    
+    NSLog(@"当前录音时长%.0f",currentRecordTimeFloat);
+    //外部的录音时长监听回调
+    if ( self.recordTimeObserverBlock) {
+        self.recordTimeObserverBlock(0,self.currentRecordTime);
+    }
+    
     //call to refresh meter values刷新平均和峰值功率,此计数是以对数刻度计量的,-160表示完全安静，0表示最大输入值
     
     //输入声音的分贝大小计算
@@ -427,8 +667,6 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     if (self.timeObserverBlock) {
         if (_playerLocal) {
             
-            self.timeObserverBlock(_playerLocal.duration,_playerLocal.currentTime);
-            NSLog(@"********%f-------%f",_playerLocal.duration,_playerLocal.currentTime);
             
             if ((_playerLocal.duration-_playerLocal.currentTime) < playerTimeObserverMargin*5) {
                 
@@ -440,18 +678,26 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
             
         }else{
             
-            self.timeObserverBlock(_playerNetwork.currentItem.duration.value,_playerNetwork.currentItem.currentTime.value);
-            NSLog(@"********%lld-------%lld",_playerNetwork.currentItem.duration.value,_playerNetwork.currentItem.currentTime.value);
             
-            if ((_netAudioTime-_playerLocal.currentTime) < playerTimeObserverMargin*5) {
-                
-                [progressTimer invalidate];
-                progressTimer = nil;
-                
-                NSLog(@"完毕");
-            }
+            self.timeObserverBlock(self.netAudioTime,self.currentPlayTime);
+            
         }
     }
+}
+
+-(CGFloat)getLocalRecordTime{
+    
+    if (_playerLocal) {
+        return _playerLocal.duration;
+    }
+    
+    return 0;
+}
+
+//录音文件路径
+-(NSString *)getRecorderPath{
+    NSString *docDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    return [NSString stringWithFormat:@"%@/play.aac",docDir];
 }
 
 //判断是否插入耳机
@@ -463,13 +709,18 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     }
     return NO;
 }
-#pragma mark lazy========================
+
+-(BOOL)isRecording{
+    return self.recorder.isRecording;
+}
+
+#pragma mark lazy=====================
 -(AVAudioRecorder *)recorder{
     
     if (!_recorder) {
         NSError *error = nil;
         //必须真机上测试,模拟器上可能会崩溃
-        _recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL URLWithString:playName] settings:recorderSettingsDict error:&error];
+        _recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL URLWithString:[self getRecorderPath]] settings:recorderSettingsDict error:&error];
     }
     return _recorder;
 }
@@ -477,11 +728,10 @@ static const CGFloat playerTimeObserverMargin = 0.005; //音量监听的timer间
     
     if (!_playerLocal) {
         NSError *playerError;
-        _playerLocal = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:playName] error:&playerError];
+        _playerLocal = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:[self getRecorderPath]] error:&playerError];
     }
     return _playerLocal;
 }
-
 
 @end
 
