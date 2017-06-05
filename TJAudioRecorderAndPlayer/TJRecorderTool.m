@@ -303,7 +303,7 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
         return ^(){
             
             
-            if (weakSelf.playerLocal){
+            if (_playerLocal){
                 
                 [weakSelf.playerLocal pause];
                 
@@ -324,19 +324,21 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
         __weak typeof(self) weakself = self;
         return ^(){
             
-            [weakself.playerLocal play];
-            
-            //启动定时器
-            if (!progressTimer) {
+            if (_playerLocal) {
+                [weakself.playerLocal play];
                 
-                progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
-            }else{
+                //启动定时器
+                if (!progressTimer) {
+                    
+                    progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
+                }else{
+                    
+                    [progressTimer  setFireDate:[NSDate distantPast]];
+                }
                 
-                [progressTimer  setFireDate:[NSDate distantPast]];
+                NSLog(@"继续播放本地录音");
             }
-            
-            NSLog(@"继续播放本地录音");
-            
+
             return weakself;
         };
         
@@ -353,7 +355,7 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
         return ^(){
             
             
-            if (weakSelf.playerLocal){
+            if (_playerLocal){
                 
                 [weakSelf.playerLocal stop];
                 weakSelf.playerLocal = nil;

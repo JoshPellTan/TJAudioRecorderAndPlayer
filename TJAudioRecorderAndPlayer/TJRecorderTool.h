@@ -19,7 +19,6 @@ typedef void (^configerTimeFeedback)(NSString *totalTime,NSString *currentTime);
 typedef void (^configerVolume)(CGFloat colume);
 typedef NSData *(^configerRecorderData)();
 
-
 @interface TJRecorderTool : NSObject
 
 /*
@@ -101,7 +100,7 @@ typedef NSData *(^configerRecorderData)();
  */
 @property (nonatomic, copy) configerRecorderData getRecorderDataBlock;
 /*
- *  获取最后一次录音的数据
+ *  播放完成回调
  */
 @property (nonatomic, copy) void (^playerFinished)();
 
