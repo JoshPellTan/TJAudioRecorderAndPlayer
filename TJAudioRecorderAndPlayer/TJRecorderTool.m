@@ -20,8 +20,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
     NSDictionary *recorderSettingsDict;
     //音量监控定时器
     NSTimer *volumeTimer;
-    //进度监控定时器
-    NSTimer *progressTimer;
     double lowPassResults;
     
     id timeObserve;
@@ -280,14 +278,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
                 
             }
         
-            //启动定时器
-            if (!progressTimer) {
-                
-                progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
-            }else{
-                
-                [progressTimer  setFireDate:[NSDate distantPast]];
-            }
             return weakSelf;
         };
         
@@ -308,7 +298,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
                 [weakSelf.playerLocal pause];
                 
                 NSLog(@"暂停播放本地录音");
-                [progressTimer setFireDate:[NSDate distantFuture]];
             }
             
             return weakSelf;
@@ -326,15 +315,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
             
             if (_playerLocal) {
                 [weakself.playerLocal play];
-                
-                //启动定时器
-                if (!progressTimer) {
-                    
-                    progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
-                }else{
-                    
-                    [progressTimer  setFireDate:[NSDate distantPast]];
-                }
                 
                 NSLog(@"继续播放本地录音");
             }
@@ -361,8 +341,7 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
                 weakSelf.playerLocal = nil;
                 
                 NSLog(@"停止播放本地录音");
-                [progressTimer invalidate];
-                progressTimer = nil;
+
             }
             
             return weakSelf;
@@ -404,16 +383,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
         
         return ^(){
             
-            
-            //启动定时器
-            if (!progressTimer) {
-                
-                progressTimer = [NSTimer scheduledTimerWithTimeInterval:playerTimeObserverMargin target:self selector:@selector(recorderTimeViewer) userInfo:nil repeats:YES];
-            }else{
-                
-                [progressTimer  setFireDate:[NSDate distantPast]];
-            }
-            
             [_networkAudioPlayer play];
             
             return weakself;
@@ -434,11 +403,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
             
             [_networkAudioPlayer  pause];
             
-            if (progressTimer) {
-                //定时器暂停
-                [progressTimer setFireDate:[NSDate distantFuture]];
-            }
-            
             return weakself;
         };
     }
@@ -457,15 +421,10 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
             
             [weakself.networkAudioPlayer pause];
             weakself.currentPlayTime = @"0";
+            weakself.currentURL = nil;
             weakself.networkAudioPlayer = nil;
-            
-            if (progressTimer) {
-                
-                [progressTimer invalidate];
-                progressTimer = nil;
-                
-            }
-            
+            weakself.songItem = nil;
+            [weakself removeObserverAction];
             
             return weakself;
         };
@@ -480,8 +439,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
     [self.networkAudioPlayer pause];
     self.netAudioTime = @"0";
     
-    [progressTimer invalidate];
-    progressTimer = nil;
     if (self.playerFinished) {
         self.playerFinished();
     }
@@ -532,6 +489,10 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
             weakSelf.currentPlayTime = [NSString stringWithFormat:@"%.f",current];
             weakSelf.netAudioTime = [NSString stringWithFormat:@"%.2f",total];
             
+            if (weakSelf.timeObserverBlock) {
+                weakSelf.timeObserverBlock(weakSelf.netAudioTime,weakSelf.currentPlayTime);
+            }
+            
         }
     }];
     
@@ -541,6 +502,15 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
     [currentItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
 }
 
+
+-(void)removeObserverAction{
+    
+    [_songItem removeObserver:self forKeyPath:@"status"];
+    [_songItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:_songItem];
+    
+    [self.networkAudioPlayer removeTimeObserver:timeObserve];
+}
 
 /**
  *  通过KVO监控播放器状态
@@ -662,29 +632,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
         
     }
     
-}
-
--(void)recorderTimeViewer{
-    
-    if (self.timeObserverBlock) {
-        if (_playerLocal) {
-            
-            
-            if ((_playerLocal.duration-_playerLocal.currentTime) < playerTimeObserverMargin*5) {
-                
-                [progressTimer invalidate];
-                progressTimer = nil;
-                
-                NSLog(@"完毕");
-            }
-            
-        }else{
-            
-            
-            self.timeObserverBlock(self.netAudioTime,self.currentPlayTime);
-            
-        }
-    }
 }
 
 -(CGFloat)getLocalRecordTime{
