@@ -436,7 +436,6 @@ static const CGFloat playerTimeObserverMargin = 0.05; //音量监听的timer间�
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     
-    [self.networkAudioPlayer pause];
     self.netAudioTime = @"0";
     
     if (self.playerFinished) {
